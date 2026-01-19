@@ -316,7 +316,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6317941389336735201, guid: a8501b1d0bd19b24bb4a84e182cd932b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.74
+      value: -12.9
       objectReference: {fileID: 0}
     - target: {fileID: 6317941389336735201, guid: a8501b1d0bd19b24bb4a84e182cd932b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -696,7 +696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6317941389336735201, guid: a8501b1d0bd19b24bb4a84e182cd932b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.26
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6317941389336735201, guid: a8501b1d0bd19b24bb4a84e182cd932b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -910,7 +910,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6317941389336735201, guid: a8501b1d0bd19b24bb4a84e182cd932b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.82
+      value: -8.1
       objectReference: {fileID: 0}
     - target: {fileID: 6317941389336735201, guid: a8501b1d0bd19b24bb4a84e182cd932b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1083,7 +1083,7 @@ GameObject:
   - component: {fileID: 1263624734}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: Building
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1255,7 +1255,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8777039565457960158, guid: b4b81867a4dfa6f48aaffd84c75296a5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1
+      value: 9.54
       objectReference: {fileID: 0}
     - target: {fileID: 8777039565457960158, guid: b4b81867a4dfa6f48aaffd84c75296a5, type: 3}
       propertyPath: m_LocalRotation.w

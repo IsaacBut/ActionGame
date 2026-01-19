@@ -118,10 +118,13 @@ public class Golem_AI : Monster_Anime
 
         rightHand.CreateRock();
 
-        // 不冻结 Animator，更安全
         yield return rightHand.DropSpotAmine(lockedPlayer.transform.position);
 
         yield return WaitForAnimation("ThrowRock", 0.45f);
+        Vector3 dir = lockedPlayer.transform.position - transform.position;
+        Quaternion targetRot = Quaternion.LookRotation(dir);
+
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, 720f * Time.deltaTime);
         rightHand.Throw();
 
         yield return WaitForAnimation("ThrowRock", 0.8f);

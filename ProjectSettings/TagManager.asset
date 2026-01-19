@@ -9,6 +9,8 @@ TagManager:
   - Sword
   - Shield
   - Enemy
+  - Enemy_Attack
+  - Building
   layers:
   - Default
   - TransparentFX
