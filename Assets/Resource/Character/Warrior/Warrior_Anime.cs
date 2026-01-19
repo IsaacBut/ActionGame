@@ -1,18 +1,19 @@
 using UnityEngine;
 using System.Collections;
+using System.Security.Cryptography.X509Certificates;
 
 /// <summary>
-/// 戦士（Warrior）専用のアニメーション制御クラス。
-/// Character_Anime を継承し、移動・停止・攻撃・ロールなど
-/// 戦士固有のアニメーション挙動を実装します。
+/// 戦士（Warrior）専用のアニ?ーシ??制御ク?ス。
+/// Character_Anime を継承し、移動・停止・攻?・?ー?など
+/// 戦士固有のアニ?ーシ???動を実?します。
 /// </summary>
 public class Warrior_Anime : Character_Anime
 {
     /// <summary>
-    /// アニメーションの初期化処理。
+    /// アニ?ーシ??の?期化??。
     /// ・Animator の取得
-    /// ・バトル／通常状態の初期設定
-    /// ・コンボ初期化
+    /// ・バト?／通常状態の?期設定
+    /// ・コ?ボ?期化
     /// </summary>
     public override void AnimeInit()
     {
@@ -28,9 +29,9 @@ public class Warrior_Anime : Character_Anime
 
     }
     /// <summary>
-    /// 移動開始時のアニメーション切り替え処理。
-    /// Move フラグが false の場合に true へ変更し、
-    /// Animator 側の "Move" パラメータを更新します。
+    /// 移動開始?のアニ?ーシ??切り替え??。
+    /// Move フ?グが false の場?に true へ変更し、
+    /// Animator 側の "Move" パ??ータを更新します。
     /// </summary>
     public override void Move()
     {
@@ -38,9 +39,9 @@ public class Warrior_Anime : Character_Anime
         animator.SetBool("Move", move);
     }
     /// <summary>
-    /// 停止時のアニメーション切り替え処理。
-    /// Move フラグが true の場合に false へ変更し、
-    /// Animator 側の "Move" パラメータを更新します。
+    /// 停止?のアニ?ーシ??切り替え??。
+    /// Move フ?グが true の場?に false へ変更し、
+    /// Animator 側の "Move" パ??ータを更新します。
     /// </summary>
     public override void Stop()
     {
@@ -49,12 +50,12 @@ public class Warrior_Anime : Character_Anime
 
     }
     /// <summary>
-    /// 攻撃アニメーション処理。
-    /// ・攻撃入力を無効化 (canAttack = false)
+    /// 攻?アニ?ーシ????。
+    /// ・攻?入力を無効化 (canAttack = false)
     /// ・Attack_Combo ステートへ CrossFade
-    /// ・手の開閉(rightHand)と攻撃タイミングを同期
-    /// ・コンボ段階の更新
-    /// ・AttackCD() により次回攻撃受付を制御
+    /// ・手の開閉(rightHand)と攻?タイミ?グを同期
+    /// ・コ?ボ段階の更新
+    /// ・AttackCD() により?回攻?受付を制御
     /// </summary>
     public override IEnumerator Attack()
     {
@@ -64,19 +65,19 @@ public class Warrior_Anime : Character_Anime
         animator.CrossFade("Attack_Combo", 0.1f);
         animator.SetInteger("Attack_Combo", (int)attackComboType);
 
-        // 攻撃判定のタイミング調整（箱を開く）
+        // 攻?判定のタイミ?グ調整（?を開く）
         rightHand.OpenBox();
         yield return WaitForAnimation(AttackAnimeCrip(), 0.8f);
         rightHand.CloseBox();
 
-        // 次のコンボ段階を計算
+        // ?のコ?ボ段階を計算
         int nextCombo = (int)attackComboType + 1;
 
         if (nextCombo >= maxCombo)
             nextCombo = 1;
         attackComboType = (AttackComboType)nextCombo;
 
-        // 攻撃クールダウン管理
+        // 攻?クー?ダウ?管?
         if (attackCdCoroutine == null)
             attackCdCoroutine = StartCoroutine(AttackCD());
         yield return attackCdCoroutine;
@@ -85,10 +86,10 @@ public class Warrior_Anime : Character_Anime
     }
 
     /// <summary>
-    /// ロール（回避）アニメーション処理。
-    /// ・canRool / canAttack のフラグ管理
+    /// ?ー?（回避）アニ?ーシ????。
+    /// ・canRool / canAttack のフ?グ管?
     /// ・"Roll_Start" へ CrossFade
-    /// ・"Roll_End" の一定時間経過まで待機
+    /// ・"Roll_End" の一定?間経過まで待機
     /// </summary>
     public override IEnumerator Rool()
     {
@@ -96,6 +97,17 @@ public class Warrior_Anime : Character_Anime
         canAttack = true;
         canRool = false;
         animator.CrossFade("Roll_Start", 0.1f);
+        yield return new WaitUntil(() =>
+                   animator.GetCurrentAnimatorStateInfo(0).IsName("Roll_Start"));
+        float loopLimit = animator.GetCurrentAnimatorStateInfo(0).length - 0.1f;
+        float loopPart = loopLimit / 10;
+
+        for (float i = 0.1f + loopPart; i < loopLimit; i += loopPart) 
+        {
+            yield return WaitForAnimation("Roll_Start", i);
+            transform.position += transform.forward * 0.15f;
+        }
+
 
         // Roll_End の 0.5f (50%) まで再生を待機
         yield return WaitForAnimation("Roll_End", 0.5f);

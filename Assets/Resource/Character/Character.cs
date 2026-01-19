@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using static SkillBuff;
+using static UnityEngine.Rendering.DebugUI;
 
 /// <summary>
 /// キャラクターのステータス・装備・バフ処理を管理するクラス。
@@ -10,6 +11,12 @@ public class Character : MonoBehaviour
 {
     /// <summary>キャラクターが生存している累計時間（秒）</summary>
     public float characterTimer;
+
+    /// <summary>
+    /// 攻撃判定用の BoxCollider。  
+    /// read-only（外部から set 不可）として管理します。
+    /// </summary>
+    public BoxCollider hitBox { get; private set; }
 
     /// <summary>
     /// キャラクターのステージ（行動状態）を表す列挙体。  
@@ -124,13 +131,14 @@ public class Character : MonoBehaviour
     /// キャラクターの基礎ステータスおよびバフ管理用のコレクションを初期化する。
     /// キャラ生成時やゲーム開始時に 1 回だけ呼び出す想定。
     /// </summary>
-    public void StatusInit(int Hp,int Mp,int Str)
+    public void StatusInit(BoxCollider boxCollider, int Hp,int Mp,int Str)
     {
+        hitBox = boxCollider;
         maxHp = Hp; maxMp = Mp; baseStr = Str;
         // 現在値を最大値で初期化
         hp = maxHp; mp = maxMp; str = Str;
         // バフ管理セットを初期化
-        moveSpeed = 1.0f;
+        moveSpeed = 3.0f;
     }
 
     public virtual void CharacterInit() { } 
