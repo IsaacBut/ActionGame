@@ -1,11 +1,15 @@
 ﻿using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+
 using static Character;
 
 public class Character_Input : MonoBehaviour
 {
     private InPut input = new InPut();
     public Character_Anime character_Anime;
+
     private void Awake()
     {
         input.GetInputDevice();
@@ -21,10 +25,12 @@ public class Character_Input : MonoBehaviour
         character_Anime.Timer();
         character_Anime.AnimeTimer();
         character_Anime.ReturnIdle();
+        CameraMove();
 
         MoveInput();
         RoolInput();
         AttackInput();
+
     }
 
     private void FixedUpdate()
@@ -34,15 +40,68 @@ public class Character_Input : MonoBehaviour
         character_Anime.RightWeponStatus();
     }
 
-    private const float rollTime = 1.5f;
-    private const float attackTime = 1.5f;
+    #region Camera&Canvas
+
+    private void CameraMove() => InGameManager.Instance.CameraFollow(this.transform.position);
+
+    public Image markBasePrefab;
+    public Image markArrowPrefab;
+
+    public Canvas mainCanvas;
+
+    private Image markBase;
+    private Image markArrow;
+    private void TouchMarkBase(Vector2 targetPoint)
+    {
+        if (markBase != null) return;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            mainCanvas.transform as RectTransform,
+            targetPoint,
+            mainCanvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : mainCanvas.worldCamera,
+            out Vector2 localPos
+        );
+
+        markBase = Instantiate(markBasePrefab, mainCanvas.transform);
+        markBase.GetComponent<RectTransform>().anchoredPosition = localPos;
+    }
+    private void TouchMarkArrow(Vector2 targetPoint)
+    {
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            mainCanvas.transform as RectTransform,
+            targetPoint,
+            mainCanvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : mainCanvas.worldCamera,
+            out Vector2 localPos
+        );
+
+        if (markArrow == null)
+        {
+            markArrow = Instantiate(markArrowPrefab, mainCanvas.transform);
+        }
+
+        markArrow.GetComponent<RectTransform>().anchoredPosition = localPos;
+    }
 
 
-    #region Move And Roll
+    private void MarkDele()
+    {
+        Destroy(markBase);
+        Destroy(markArrow);
+    }
+    #endregion
 
-    private float minRollDistance = 50f; 
+
+
+    #region Human 
+
+    private float minRollDistance = 10f; 
     //private float middleRollDistance = 150f;
-    private float maxRollDistance = 100; 
+    private float maxRollDistance = 40; 
 
     private const float rollTimeCD = 0.3f;     // 多长按不会触发
     private float roolTimeCount;
@@ -54,20 +113,17 @@ public class Character_Input : MonoBehaviour
     {
         if (!character_Anime.canRool) return;
 
-        // 按下
         if (input.mouse.leftButton.wasPressedThisFrame)
         {
             clickPoint = input.mouse.position.ReadValue();
             roolTimeCount = 0f;
         }
 
-        // 按住中（累計時間）
         if (input.mouse.leftButton.isPressed)
         {
             roolTimeCount += Time.deltaTime;
         }
 
-        // 松开
         if (input.mouse.leftButton.wasReleasedThisFrame)
         {
             nowPoint = input.mouse.position.ReadValue();
@@ -88,8 +144,8 @@ public class Character_Input : MonoBehaviour
             var angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
             angle += Camera.main.transform.eulerAngles.y;
             transform.rotation = Quaternion.Euler(0, angle, 0);
-
             StartCoroutine(character_Anime.Rool());
+
             roolTimeCount = 0;
         }
     }
@@ -116,8 +172,8 @@ public class Character_Input : MonoBehaviour
         var dragDistance = (end - start).magnitude;
 
         if (dragDistance < minRollDistance) return 0;
-        else if (dragDistance > minRollDistance && dragDistance < maxRollDistance) return character_Anime.moveSpeed;
-        else if (dragDistance > maxRollDistance) return character_Anime.moveSpeed * 3;
+        else if (dragDistance > minRollDistance/* && dragDistance < maxRollDistance*/) return character_Anime.moveSpeed * 3;
+        //else if (dragDistance > maxRollDistance) return character_Anime.moveSpeed * 3;
 
         Debug.LogWarning("Move Speed Error");
         return 0;
@@ -126,19 +182,23 @@ public class Character_Input : MonoBehaviour
 
     public void MoveInput()
     {
-        if (input.mouse.leftButton.wasPressedThisFrame) clickPoint = input.mouse.position.ReadValue();
+        if (character_Anime.nowStage != CharacterStage.Move) MarkDele();
+        //if (input.mouse.leftButton.wasPressedThisFrame) clickPoint = input.mouse.position.ReadValue();
 
         if (!MousePressed(0.25f))
         {
+
             character_Anime.Stop();
             return;
         }
         else
         {
             if (!character_Anime.ChangeStage(CharacterStage.Move)) return;
-
             character_Anime.lastInputTime = character_Anime.characterTimer;
             nowPoint = input.mouse.position.ReadValue();
+
+            TouchMarkBase(nowPoint);
+            TouchMarkArrow(nowPoint);
 
             Vector3 aPoint = new Vector3(clickPoint.x, 0, clickPoint.y);
             Vector3 bPoint = new Vector3(nowPoint.x, 0, nowPoint.y);
@@ -155,9 +215,6 @@ public class Character_Input : MonoBehaviour
         }
 
     }
-    #endregion
-
-    #region Attack
 
     private void AttackInput()
     {
@@ -172,6 +229,9 @@ public class Character_Input : MonoBehaviour
 
 
     #endregion
+
+
+
 
 
 }

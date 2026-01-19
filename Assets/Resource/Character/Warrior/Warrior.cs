@@ -10,11 +10,7 @@
 /// </summary>
 public class Warrior : Warrior_Anime
 {
-    /// <summary>
-    /// 攻撃判定用の BoxCollider。  
-    /// read-only（外部から set 不可）として管理します。
-    /// </summary>
-    public BoxCollider hitBox { get; private set; }
+
     /// <summary>
     /// 戦士の初期化処理。  
     /// ・Collider の取得  
@@ -24,12 +20,10 @@ public class Warrior : Warrior_Anime
     /// </summary>
     public override void CharacterInit()
     {
-        // 当たり判定の BoxCollider を取得
-        hitBox = this.gameObject.GetComponent<BoxCollider>();
         // アニメーション初期化
         AnimeInit();
         // ステータス初期化（HP, 攻撃力, スタミナ）
-        StatusInit(100, 20, 50);
+        StatusInit(this.gameObject.GetComponent<BoxCollider>(), 100, 20, 50);
         // 入力時間初期化
         lastInputTime = characterTimer;       
         // キャラクターステージ初期ステート
